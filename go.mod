@@ -1,4 +1,4 @@
-module github.com/adsr303/svgcolors
+module github.com/adsr303/hexcolors
 
 go 1.23.2
 

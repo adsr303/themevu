@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,9 @@ import (
 )
 
 func main() {
+	var showCode bool
+	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
+	flag.Parse()
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -25,7 +29,10 @@ func main() {
 		default:
 			log.Fatalf("invalid color code: %s", line)
 		}
-		err := printlnRGB(r, g, b)
+		if !showCode {
+			line = fullBlocks
+		}
+		err := printlnRGB(r, g, b, line)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -38,12 +45,12 @@ func main() {
 
 const fullBlocks = "\u2588\u2588\u2588"
 
-func printlnRGB(r, g, b string) error {
+func printlnRGB(r, g, b, text string) error {
 	rgb, err := hexToInt(r, g, b)
 	if err != nil {
 		return err
 	}
-	color.RGB(rgb[0], rgb[1], rgb[2]).Println(fullBlocks)
+	color.RGB(rgb[0], rgb[1], rgb[2]).Println(text)
 	return nil
 }
 

@@ -52,28 +52,25 @@ func ParseTheme(yml []byte) (Gogh, error) {
 type GoghColor struct {
 	Name     string
 	YamlName string
-	Number   int
 }
 
 var numberedColor = regexp.MustCompile(`^color_[0-9]{2}$`)
 
-func GetColorCodes(g Gogh) []GoghColor {
-	var result []GoghColor
-	t := reflect.TypeOf(g)
-	for i := range t.NumField() {
-		f := t.Field(i)
-		yamlTag := f.Tag.Get("yaml")
+func (g Gogh) NumberedColors() []GoghColor {
+	result := make([]GoghColor, 16)
+	gType := reflect.TypeOf(g)
+	for i := range gType.NumField() {
+		field := gType.Field(i)
+		yamlTag := field.Tag.Get("yaml")
 		if numberedColor.MatchString(yamlTag) {
 			number, err := strconv.Atoi(yamlTag[6:])
 			if err != nil {
 				log.Fatal(err)
 			}
-			color := GoghColor{
-				Name:     f.Name,
+			result[number-1] = GoghColor{
+				Name:     field.Name,
 				YamlName: yamlTag,
-				Number:   number,
 			}
-			result = append(result, color)
 		}
 	}
 	return result

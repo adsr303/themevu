@@ -1,6 +1,13 @@
 package gogh
 
-import "github.com/goccy/go-yaml"
+import (
+	"log"
+	"reflect"
+	"regexp"
+	"strconv"
+
+	"github.com/goccy/go-yaml"
+)
 
 // Type Gogh represents the YAML format from the [Gogh terminal themes collection].
 //
@@ -40,4 +47,34 @@ func ParseTheme(yml []byte) (Gogh, error) {
 		return g, err
 	}
 	return g, nil
+}
+
+type GoghColor struct {
+	Name     string
+	YamlName string
+	Number   int
+}
+
+var numberedColor = regexp.MustCompile(`^color_[0-9]{2}$`)
+
+func GetColorCodes(g Gogh) []GoghColor {
+	var result []GoghColor
+	t := reflect.TypeOf(g)
+	for i := range t.NumField() {
+		f := t.Field(i)
+		yamlTag := f.Tag.Get("yaml")
+		if numberedColor.MatchString(yamlTag) {
+			number, err := strconv.Atoi(yamlTag[6:])
+			if err != nil {
+				log.Fatal(err)
+			}
+			color := GoghColor{
+				Name:     f.Name,
+				YamlName: yamlTag,
+				Number:   number,
+			}
+			result = append(result, color)
+		}
+	}
+	return result
 }

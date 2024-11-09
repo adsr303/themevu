@@ -1,4 +1,4 @@
-module github.com/adsr303/hexcolors
+module github.com/adsr303/themevu
 
 go 1.23.2
 

@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/adsr303/hexcolors/gogh"
+	"github.com/adsr303/themevu/gogh"
 )
 
 //go:embed Nanosecond.yml

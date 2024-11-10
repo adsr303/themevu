@@ -33,14 +33,14 @@ Cursor
 `
 
 var colors = []string{
-	"Black",
-	"Red",
-	"Green",
+	"Black *",
+	"Red ***",
+	"Green *",
 	"Yellow",
-	"Blue",
+	"Blue **",
 	"Magenta",
-	"Cyan",
-	"White",
+	"Cyan **",
+	"White *",
 }
 
 func PrintColorPair(codes []string, index int, background string) {

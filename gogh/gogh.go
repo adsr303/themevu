@@ -49,15 +49,10 @@ func ParseTheme(yml []byte) (Gogh, error) {
 	return g, nil
 }
 
-type GoghColor struct {
-	Name     string
-	YamlName string
-}
-
 var numberedColor = regexp.MustCompile(`^color_[0-9]{2}$`)
 
-func (g Gogh) NumberedColors() []GoghColor {
-	result := make([]GoghColor, 16)
+func (g Gogh) NumberedColors() []string {
+	result := make([]string, 16)
 	gType := reflect.TypeOf(g)
 	for i := range gType.NumField() {
 		field := gType.Field(i)
@@ -67,10 +62,7 @@ func (g Gogh) NumberedColors() []GoghColor {
 			if err != nil {
 				log.Fatal(err)
 			}
-			result[number-1] = GoghColor{
-				Name:     field.Name,
-				YamlName: yamlTag,
-			}
+			result[number-1] = reflect.ValueOf(g).FieldByName(field.Name).String()
 		}
 	}
 	return result

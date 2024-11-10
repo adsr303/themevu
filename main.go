@@ -35,6 +35,7 @@ func showTheme(goghFile string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
 	c := g.NumberedColors()
 	for i := range 8 {
 		simulation.PrintColorPair(c, i, g.Background)

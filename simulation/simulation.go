@@ -7,30 +7,12 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-const template = `
-Black
-Red
-Green
-Yellow
-Blue
-Magenta
-Cyan
-White
-
-Bright Black
-Bright Red
-Bright Green
-Bright Yellow
-Bright Blue
-Bright Magenta
-Bright Cyan
-Bright White
-
-Background
-Foreground
-
-Cursor
-`
+func PrintTitle(name, fg, bg, cursor string) {
+	printColor(name, fg, bg)
+	fmt.Print(" ")
+	printColor("\u2588", cursor, bg, color.BlinkSlow)
+	fmt.Println()
+}
 
 var colors = []string{
 	"Black *",
@@ -44,8 +26,8 @@ var colors = []string{
 }
 
 func PrintColorPair(codes []string, index int, background string) {
-	regular := fmt.Sprintf(" %-7s %s ", colors[index], codes[index])
-	bright := fmt.Sprintf(" %-7s %s ", colors[index], codes[index+8])
+	regular := fmt.Sprintf(" %-7s %7s ", colors[index], codes[index])
+	bright := fmt.Sprintf(" %-7s %7s ", colors[index], codes[index+8])
 	printColor(regular, codes[index], background)
 	printColor(bright, codes[index+8], background)
 	printColor(regular, codes[index], background, color.ReverseVideo)

@@ -44,8 +44,8 @@ var colors = []string{
 }
 
 func PrintColorPair(codes []string, index int, background string) {
-	regular := fmt.Sprintf(" %-8s %s ", colors[index], codes[index])
-	bright := fmt.Sprintf(" %-8s %s ", colors[index], codes[index+8])
+	regular := fmt.Sprintf(" %-7s %s ", colors[index], codes[index])
+	bright := fmt.Sprintf(" %-7s %s ", colors[index], codes[index+8])
 	printColor(regular, codes[index], background)
 	printColor(bright, codes[index+8], background)
 	printColor(regular, codes[index], background, color.ReverseVideo)

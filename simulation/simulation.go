@@ -2,15 +2,22 @@ package simulation
 
 import (
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 	"github.com/gdamore/tcell/v2"
 )
 
+const width = 3 * (2*7 + 3) // 3 columns of " %-7s %7s "
+
 func PrintTitle(name, fg, bg, cursor string) {
-	printColor(name, fg, bg)
-	fmt.Print(" ")
+	nameLength := utf8.RuneCountInString(name)
+	offset := (width - nameLength - 2) / 2 // Includes cursor
+	paddedName := fmt.Sprintf("%*s%s ", offset, "", name)
+	printColor(paddedName, fg, bg)
 	printColor("\u2588", cursor, bg, color.BlinkSlow)
+	completion := fmt.Sprintf("%*s", width-nameLength-offset-2, "")
+	printColor(completion, fg, bg)
 	fmt.Println()
 }
 

@@ -15,10 +15,15 @@ import (
 
 func main() {
 	var showCode bool
+	var forceColor bool
 	var goghFile string
 	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
+	flag.BoolVar(&forceColor, "force", false, "force color output")
 	flag.StringVar(&goghFile, "gogh", "", "display colors from a Gogh theme")
 	flag.Parse()
+	if forceColor {
+		color.NoColor = false
+	}
 	if goghFile == "" {
 		showStdin(showCode)
 	} else {

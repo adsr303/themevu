@@ -3,6 +3,7 @@ package simulation
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
@@ -16,7 +17,13 @@ func PrintTitle(name, fg, bg, cursor string) {
 	s := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(fg)).
 		Background(lipgloss.Color(bg))
-	fmt.Println(s.Render(title)) // TODO Cursor color
+	cs := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(cursor)).
+		Background(lipgloss.Color(bg))
+	parts := strings.Split(title, fullBlock)
+	fmt.Print(s.Render(parts[0]))
+	fmt.Print(cs.Render(fullBlock))
+	fmt.Println(s.Render(parts[1]))
 }
 
 var colors = []string{

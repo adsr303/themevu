@@ -16,7 +16,7 @@ func PrintTitle(name, fg, bg, cursor string) {
 	s := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(fg)).
 		Background(lipgloss.Color(bg))
-	fmt.Println(s.Render(title))
+	fmt.Println(s.Render(title)) // TODO Cursor color
 }
 
 var colors = []string{

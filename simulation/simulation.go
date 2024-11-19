@@ -3,25 +3,20 @@ package simulation
 import (
 	"fmt"
 	"log"
-	"unicode/utf8"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
-	"github.com/fatih/color"
-	"github.com/gdamore/tcell/v2"
 )
 
 const width = 3 * (2*7 + 3) // 3 columns of " %-7s %7s "
+const fullBlock = "\u2588"
 
 func PrintTitle(name, fg, bg, cursor string) {
-	nameLength := utf8.RuneCountInString(name)
-	offset := (width - nameLength - 2) / 2 // Includes cursor
-	paddedName := fmt.Sprintf("%*s%s ", offset, "", name)
-	printColor(paddedName, fg, bg)
-	printColor("\u2588", cursor, bg, color.BlinkSlow)
-	completion := fmt.Sprintf("%*s", width-nameLength-offset-2, "")
-	printColor(completion, fg, bg)
-	fmt.Println()
+	title := lipgloss.PlaceHorizontal(width, lipgloss.Center, fmt.Sprintf("%s %s", name, fullBlock))
+	s := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(fg)).
+		Background(lipgloss.Color(bg))
+	fmt.Println(s.Render(title))
 }
 
 var colors = []string{
@@ -71,20 +66,4 @@ func PrintAsTable(codes []string, background string) {
 		}).
 		Rows(rows...)
 	fmt.Println(t)
-}
-
-func printColor(label, fg, bg string, attr ...color.Attribute) {
-	fc := getRGB(fg)
-	bc := getRGB(bg)
-	c := color.RGB(fc.r, fc.g, fc.b).AddBgRGB(bc.r, bc.g, bc.b).Add(attr...)
-	c.Print(label)
-}
-
-type rgb struct {
-	r, g, b int
-}
-
-func getRGB(code string) rgb {
-	r, g, b := tcell.GetColor(code).RGB()
-	return rgb{int(r), int(g), int(b)}
 }

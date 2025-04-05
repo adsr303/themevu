@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/adsr303/themevu/colors"
 	"github.com/adsr303/themevu/gogh"
 	"github.com/adsr303/themevu/simulation"
 	"github.com/charmbracelet/lipgloss"
@@ -22,7 +23,7 @@ func main() {
 	flag.StringVar(&goghFile, "gogh", "", "display colors from a Gogh theme")
 	flag.Parse()
 	if goghFile == "" {
-		showStdin(showCode)
+		showStdin(showCode, permutate)
 	} else {
 		showTheme(goghFile)
 	}
@@ -42,21 +43,36 @@ func showTheme(goghFile string) {
 	simulation.PrintAsTable(c, g.Background)
 }
 
-func showStdin(showCode bool) {
+func showStdin(showCode, permutate bool) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		s := lipgloss.NewStyle().
-			Foreground(lipgloss.Color(line))
-		if !showCode {
-			line = fullBlocks
+		if permutate {
+			codes, err := colors.PermutateRGB(line)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, c := range codes {
+				show(c, showCode)
+			}
+		} else {
+			show(line, showCode)
 		}
-		fmt.Println(s.Render(line))
+		fmt.Println()
 	}
 	err := scanner.Err()
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func show(code string, showCode bool) {
+	s := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(code))
+	if !showCode {
+		code = fullBlocks
+	}
+	fmt.Print(s.Render(code))
 }
 
 const fullBlocks = "\u2588\u2588\u2588"

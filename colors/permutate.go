@@ -16,9 +16,14 @@ func PermutateRGB(color string) ([]string, error) {
 	}
 	hex, _ := strings.CutPrefix(color, "#")
 	values := []string{hex[0:2], hex[2:4], hex[4:6]}
-	result := []string{}
+	result := make([]string, 0)
+	watch := make(map[string]bool)
 	for _, s := range permute.Permutations(values) {
-		result = append(result, strings.Join(s, ""))
+		next := "#" + strings.Join(s, "")
+		if !watch[next] {
+			result = append(result, next)
+			watch[next] = true
+		}
 	}
 	return result, nil
 }

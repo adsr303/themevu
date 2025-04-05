@@ -15,8 +15,14 @@ func TestPermutateRGB(t *testing.T) {
 	}{
 		{"#555", nil, true},
 		{"fff", nil, true},
-		{"abcdef", []string{"abcdef", "abefcd", "cdabef", "cdefab", "efabcd", "efcdab"}, false},
-		{"#abcdef", []string{"abcdef", "abefcd", "cdabef", "cdefab", "efabcd", "efcdab"}, false},
+		{"#12345678", nil, true},
+		{"random", nil, true},
+		{"abcdef", []string{"#abcdef", "#abefcd", "#cdabef", "#cdefab", "#efabcd", "#efcdab"}, false},
+		{"#abcdef", []string{"#abcdef", "#abefcd", "#cdabef", "#cdefab", "#efabcd", "#efcdab"}, false},
+		{"#aabbbb", []string{"#aabbbb", "#bbaabb", "#bbbbaa"}, false},
+		{"#bbaabb", []string{"#aabbbb", "#bbaabb", "#bbbbaa"}, false},
+		{"#bbbbaa", []string{"#aabbbb", "#bbaabb", "#bbbbaa"}, false},
+		{"#737373", []string{"#737373"}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.color, func(t *testing.T) {

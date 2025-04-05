@@ -15,8 +15,10 @@ import (
 
 func main() {
 	var showCode bool
+	var permutate bool
 	var goghFile string
 	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
+	flag.BoolVar(&permutate, "permutate", false, "generate a color swatch of RGB permutations")
 	flag.StringVar(&goghFile, "gogh", "", "display colors from a Gogh theme")
 	flag.Parse()
 	if goghFile == "" {

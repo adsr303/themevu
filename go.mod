@@ -4,6 +4,7 @@ go 1.24
 
 require (
 	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/etnz/permute v1.0.2
 	github.com/goccy/go-yaml v1.17.1
 )
 

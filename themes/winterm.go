@@ -1,4 +1,4 @@
-package winterm
+package themes
 
 import (
 	"encoding/json"
@@ -36,7 +36,7 @@ type Terminal struct {
 	BrightWhite  string `json:"brightWhite" terminal:"color_16"`
 }
 
-func ParseTheme(jsonBytes []byte) (Terminal, error) {
+func ParseTerminal(jsonBytes []byte) (Terminal, error) {
 	var t Terminal
 	if err := json.Unmarshal(jsonBytes, &t); err != nil {
 		return t, err
@@ -44,7 +44,7 @@ func ParseTheme(jsonBytes []byte) (Terminal, error) {
 	return t, nil
 }
 
-var numberedColor = regexp.MustCompile(`^color_[0-9]{2}$`)
+var numberedTerminalColor = regexp.MustCompile(`^color_[0-9]{2}$`)
 
 func (t Terminal) NumberedColors() []string {
 	result := make([]string, 16)
@@ -52,7 +52,7 @@ func (t Terminal) NumberedColors() []string {
 	for i := range termType.NumField() {
 		field := termType.Field(i)
 		tag := field.Tag.Get("terminal")
-		if numberedColor.MatchString(tag) {
+		if numberedTerminalColor.MatchString(tag) {
 			number, err := strconv.Atoi(tag[6:])
 			if err != nil {
 				log.Fatal(err)

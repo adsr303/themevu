@@ -1,17 +1,17 @@
-package gogh_test
+package themes_test
 
 import (
 	_ "embed"
 	"testing"
 
-	"github.com/adsr303/themevu/gogh"
+	"github.com/adsr303/themevu/themes"
 )
 
 //go:embed Nanosecond.yml
 var nanosecond []byte
 
-func TestParseTheme(t *testing.T) {
-	g, err := gogh.ParseTheme(nanosecond)
+func TestParseGogh(t *testing.T) {
+	g, err := themes.ParseGogh(nanosecond)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}

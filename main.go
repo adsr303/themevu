@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/adsr303/themevu/colors"
-	"github.com/adsr303/themevu/gogh"
 	"github.com/adsr303/themevu/simulation"
+	"github.com/adsr303/themevu/themes"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -34,7 +34,7 @@ func showTheme(goghFile string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	g, err := gogh.ParseTheme(b)
+	g, err := themes.ParseGogh(b)
 	if err != nil {
 		log.Fatal(err)
 	}

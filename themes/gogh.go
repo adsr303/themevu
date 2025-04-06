@@ -1,4 +1,4 @@
-package gogh
+package themes
 
 import (
 	"log"
@@ -41,7 +41,7 @@ type Gogh struct {
 	Cursor string `yaml:"cursor"` // Cursor
 }
 
-func ParseTheme(yml []byte) (Gogh, error) {
+func ParseGogh(yml []byte) (Gogh, error) {
 	var g Gogh
 	if err := yaml.Unmarshal(yml, &g); err != nil {
 		return g, err
@@ -49,7 +49,7 @@ func ParseTheme(yml []byte) (Gogh, error) {
 	return g, nil
 }
 
-var numberedColor = regexp.MustCompile(`^color_[0-9]{2}$`)
+var numberedGoghColor = regexp.MustCompile(`^color_[0-9]{2}$`)
 
 func (g Gogh) NumberedColors() []string {
 	result := make([]string, 16)
@@ -57,7 +57,7 @@ func (g Gogh) NumberedColors() []string {
 	for i := range gType.NumField() {
 		field := gType.Field(i)
 		yamlTag := field.Tag.Get("yaml")
-		if numberedColor.MatchString(yamlTag) {
+		if numberedGoghColor.MatchString(yamlTag) {
 			number, err := strconv.Atoi(yamlTag[6:])
 			if err != nil {
 				log.Fatal(err)

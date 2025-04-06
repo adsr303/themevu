@@ -17,30 +17,40 @@ import (
 func main() {
 	var showCode bool
 	var permutate bool
-	var goghFile string
+	var themeFile string
 	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
 	flag.BoolVar(&permutate, "permutate", false, "generate a color swatch of RGB permutations")
-	flag.StringVar(&goghFile, "gogh", "", "display colors from a Gogh theme")
+	flag.StringVar(&themeFile, "theme", "", "display colors from a theme file")
 	flag.Parse()
-	if goghFile == "" {
+	if themeFile == "" {
 		showStdin(showCode, permutate)
 	} else {
-		showTheme(goghFile)
+		showTheme(themeFile)
 	}
 }
 
-func showTheme(goghFile string) {
-	b, err := os.ReadFile(goghFile)
+func showTheme(path string) {
+	b, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	g, err := themes.ParseGogh(b)
-	if err != nil {
-		log.Fatal(err)
+	if b[0] == '{' {
+		t, err := themes.ParseTerminal(b)
+		if err != nil {
+			log.Fatal(err)
+		}
+		simulation.PrintTitle(t.Name, t.Foreground, t.Background, t.CursorColor)
+		c := t.NumberedColors()
+		simulation.PrintAsTable(c, t.Background)
+	} else {
+		g, err := themes.ParseGogh(b)
+		if err != nil {
+			log.Fatal(err)
+		}
+		simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
+		c := g.NumberedColors()
+		simulation.PrintAsTable(c, g.Background)
 	}
-	simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
-	c := g.NumberedColors()
-	simulation.PrintAsTable(c, g.Background)
 }
 
 func showStdin(showCode, permutate bool) {

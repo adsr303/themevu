@@ -1,11 +1,6 @@
 package themes
 
 import (
-	"log"
-	"reflect"
-	"regexp"
-	"strconv"
-
 	"github.com/goccy/go-yaml"
 )
 
@@ -17,23 +12,23 @@ type Gogh struct {
 	Author  string `yaml:"author"`
 	Variant string `yaml:"variant"` // dark or light
 
-	Black   string `yaml:"color_01"` // Black (Host)
-	Red     string `yaml:"color_02"` // Red (Syntax string)
-	Green   string `yaml:"color_03"` // Green (Command)
-	Yellow  string `yaml:"color_04"` // Yellow (Command second)
-	Blue    string `yaml:"color_05"` // Blue (Path)
-	Magenta string `yaml:"color_06"` // Magenta (Syntax var)
-	Cyan    string `yaml:"color_07"` // Cyan (Prompt)
-	White   string `yaml:"color_08"` // White
+	Black   string `yaml:"color_01" theme:"color_01"` // Black (Host)
+	Red     string `yaml:"color_02" theme:"color_02"` // Red (Syntax string)
+	Green   string `yaml:"color_03" theme:"color_03"` // Green (Command)
+	Yellow  string `yaml:"color_04" theme:"color_04"` // Yellow (Command second)
+	Blue    string `yaml:"color_05" theme:"color_05"` // Blue (Path)
+	Magenta string `yaml:"color_06" theme:"color_06"` // Magenta (Syntax var)
+	Cyan    string `yaml:"color_07" theme:"color_07"` // Cyan (Prompt)
+	White   string `yaml:"color_08" theme:"color_08"` // White
 
-	BrightBlack   string `yaml:"color_09"` // Bright Black
-	BrightRed     string `yaml:"color_10"` // Bright Red (Command error)
-	BrightGreen   string `yaml:"color_11"` // Bright Green (Exec)
-	BrightYellow  string `yaml:"color_12"` // Bright Yellow
-	BrightBlue    string `yaml:"color_13"` // Bright Blue (Folder)
-	BrightMagenta string `yaml:"color_14"` // Bright Magenta
-	BrightCyan    string `yaml:"color_15"` // Bright Cyan
-	BrightWhite   string `yaml:"color_16"` // Bright White
+	BrightBlack   string `yaml:"color_09" theme:"color_09"` // Bright Black
+	BrightRed     string `yaml:"color_10" theme:"color_10"` // Bright Red (Command error)
+	BrightGreen   string `yaml:"color_11" theme:"color_11"` // Bright Green (Exec)
+	BrightYellow  string `yaml:"color_12" theme:"color_12"` // Bright Yellow
+	BrightBlue    string `yaml:"color_13" theme:"color_13"` // Bright Blue (Folder)
+	BrightMagenta string `yaml:"color_14" theme:"color_14"` // Bright Magenta
+	BrightCyan    string `yaml:"color_15" theme:"color_15"` // Bright Cyan
+	BrightWhite   string `yaml:"color_16" theme:"color_16"` // Bright White
 
 	Background string `yaml:"background"` // Background
 	Foreground string `yaml:"foreground"` // Foreground (Text)
@@ -49,21 +44,10 @@ func ParseGogh(yml []byte) (Gogh, error) {
 	return g, nil
 }
 
-var numberedGoghColor = regexp.MustCompile(`^color_[0-9]{2}$`)
-
 func (g Gogh) NumberedColors() []string {
-	result := make([]string, 16)
-	gType := reflect.TypeOf(g)
-	for i := range gType.NumField() {
-		field := gType.Field(i)
-		yamlTag := field.Tag.Get("yaml")
-		if numberedGoghColor.MatchString(yamlTag) {
-			number, err := strconv.Atoi(yamlTag[6:])
-			if err != nil {
-				log.Fatal(err)
-			}
-			result[number-1] = reflect.ValueOf(g).FieldByName(field.Name).String()
-		}
+	result, err := NumberedColors(g)
+	if err != nil {
+		panic(err) // TODO!
 	}
 	return result
 }

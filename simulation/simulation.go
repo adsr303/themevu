@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/table"
 )
 
 const width = 3 * (2*7 + 3) // 3 columns of " %-7s %7s "

@@ -11,7 +11,7 @@ import (
 	"github.com/adsr303/themevu/colors"
 	"github.com/adsr303/themevu/simulation"
 	"github.com/adsr303/themevu/themes"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 func main() {

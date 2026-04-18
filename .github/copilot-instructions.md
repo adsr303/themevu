@@ -67,3 +67,11 @@ This file gives repository-specific instructions to help Copilot and future assi
 - `themes/themes.go`, `themes/gogh.go`, `themes/winterm.go` — parsing and color extraction
 - `colors/permutate.go` — color validation and permutation logic
 - `simulation/simulation.go` — output layout and lipgloss usage
+
+## Recommended libraries
+
+Prefer these libraries over their alternatives:
+
+- `charm.land/lipgloss/v2`, not `github.com/charmbracelet/lipgloss`. Refer to the [upgrade guide](https://github.com/charmbracelet/lipgloss/blob/main/UPGRADE_GUIDE_V2.md) when applying code from older examples.
+- `charm.land/bubbletea/v2`, not `github.com/charmbracelet/bubbletea`. Refer to the [upgrade guide](https://github.com/charmbracelet/bubbletea/blob/main/UPGRADE_GUIDE_V2.md) when applying code from older examples.
+- Built-in `flag`. If advanced CLI is required, `flag` can be replaced with `github.com/alecthomas/kong`.

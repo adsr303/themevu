@@ -6,23 +6,31 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"sort"
 	"strings"
 
+	"charm.land/lipgloss/v2"
 	"github.com/adsr303/themevu/colors"
 	"github.com/adsr303/themevu/simulation"
 	"github.com/adsr303/themevu/themes"
-	"charm.land/lipgloss/v2"
 )
 
 func main() {
-	var showCode bool
-	var permutate bool
-	var themeFile string
+	var (
+		showCode  bool
+		permutate bool
+		themeFile string
+		themesDir string
+	)
 	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
 	flag.BoolVar(&permutate, "permutate", false, "generate a color swatch of RGB permutations")
 	flag.StringVar(&themeFile, "theme", "", "display colors from a theme file")
+	flag.StringVar(&themesDir, "dir", "", "directory containing theme files")
 	flag.Parse()
-	if themeFile == "" {
+	if themesDir != "" {
+		showDir(themesDir)
+	} else if themeFile == "" {
 		showStdin(showCode, permutate)
 	} else {
 		showTheme(themeFile)
@@ -50,6 +58,31 @@ func showTheme(path string) {
 		simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
 		c := g.NumberedColors()
 		simulation.PrintAsTable(c, g.Background)
+	}
+}
+
+func showDir(dir string) {
+	matches, err := filepath.Glob(filepath.Join(dir, "*.yml"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(matches) == 0 {
+		log.Fatalf("no theme files found in %s", dir)
+	}
+	sort.Strings(matches)
+	for _, p := range matches {
+		b, err := os.ReadFile(p)
+		if err != nil {
+			log.Fatal(err)
+		}
+		g, err := themes.ParseGogh(b)
+		if err != nil {
+			log.Fatalf("parsing %s: %v", p, err)
+		}
+		simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
+		c := g.NumberedColors()
+		simulation.PrintAsTable(c, g.Background)
+		fmt.Println()
 	}
 }
 

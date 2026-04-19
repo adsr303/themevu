@@ -62,26 +62,22 @@ func showTheme(path string) {
 }
 
 func showDir(dir string) {
-	matches, err := filepath.Glob(filepath.Join(dir, "*.yml"))
+	ymlMatches, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 	if err != nil {
 		log.Fatal(err)
 	}
+	jsonMatches, err := filepath.Glob(filepath.Join(dir, "*.json"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	matches := append(ymlMatches, jsonMatches...)
 	if len(matches) == 0 {
-		log.Fatalf("no theme files found in %s", dir)
+		log.Printf("no theme files found in %s", dir)
+		return
 	}
 	sort.Strings(matches)
 	for _, p := range matches {
-		b, err := os.ReadFile(p)
-		if err != nil {
-			log.Fatal(err)
-		}
-		g, err := themes.ParseGogh(b)
-		if err != nil {
-			log.Fatalf("parsing %s: %v", p, err)
-		}
-		simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
-		c := g.NumberedColors()
-		simulation.PrintAsTable(c, g.Background)
+		showTheme(p)
 		fmt.Println()
 	}
 }

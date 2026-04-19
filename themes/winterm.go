@@ -8,8 +8,8 @@ import (
 type Terminal struct {
 	Name string `json:"name"`
 
-	Foreground          string `json:"foreground"`
-	Background          string `json:"background"`
+	Foreground          string `json:"foreground" theme:"foreground"`
+	Background          string `json:"background" theme:"background"`
 	SelectionBackground string `json:"selectionBackground"`
 	CursorColor         string `json:"cursorColor"`
 
@@ -41,9 +41,13 @@ func ParseTerminal(jsonBytes []byte) (Terminal, error) {
 }
 
 func (t Terminal) NumberedColors() []string {
-	result, err := NumberedColors(t)
+	result, err := numberedColors(t)
 	if err != nil {
 		panic(err) // TODO!
 	}
 	return result
+}
+
+func (t Terminal) Variant() (Variant, error) {
+	return getVariant(t)
 }

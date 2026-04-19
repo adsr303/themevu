@@ -18,18 +18,28 @@ import (
 
 func main() {
 	var (
-		showCode  bool
-		permutate bool
-		themeFile string
-		themesDir string
+		showCode     bool
+		permutate    bool
+		themeVariant string
+		themeFile    string
+		themesDir    string
 	)
 	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
 	flag.BoolVar(&permutate, "permutate", false, "generate a color swatch of RGB permutations")
+	flag.StringVar(&themeVariant, "variant", "", "light or dark")
 	flag.StringVar(&themeFile, "theme", "", "display colors from a theme file")
 	flag.StringVar(&themesDir, "dir", "", "directory containing theme files")
 	flag.Parse()
+
+	switch themes.Variant(themeVariant) {
+	case themes.Light, themes.Dark, "":
+		// valid
+	default:
+		log.Fatalf("invalid theme variant: %s", themeVariant)
+	}
+
 	if themesDir != "" {
-		showDir(themesDir)
+		showDir(themesDir, themeVariant)
 	} else if themeFile == "" {
 		showStdin(showCode, permutate)
 	} else {
@@ -61,7 +71,11 @@ func showTheme(path string) {
 	}
 }
 
-func showDir(dir string) {
+type variantor interface {
+	Variant() (themes.Variant, error)
+}
+
+func showDir(dir, variant string) {
 	ymlMatches, err := filepath.Glob(filepath.Join(dir, "*.yml"))
 	if err != nil {
 		log.Fatal(err)
@@ -77,8 +91,39 @@ func showDir(dir string) {
 	}
 	sort.Strings(matches)
 	for _, p := range matches {
-		showTheme(p)
-		fmt.Println()
+		b, err := os.ReadFile(p)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var theme variantor
+		ext := strings.ToLower(filepath.Ext(p))
+		switch ext {
+		case ".yml", ".yaml":
+			g, err := themes.ParseGogh(b)
+			if err != nil {
+				log.Printf("skipping %s: %v", p, err)
+				continue
+			}
+			theme = g
+		case ".json":
+			t, err := themes.ParseTerminal(b)
+			if err != nil {
+				log.Printf("skipping %s: %v", p, err)
+				continue
+			}
+			theme = t
+		default:
+			// ignore other files
+		}
+		v, err := theme.Variant()
+		if err != nil {
+			log.Printf("skipping %s (variant resolution failed): %v", p, err)
+			continue
+		}
+		if variant == "" || v == themes.Variant(variant) {
+			showTheme(p)
+			fmt.Println()
+		}
 	}
 }
 

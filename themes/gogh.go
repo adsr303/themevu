@@ -8,9 +8,9 @@ import (
 //
 // [Gogh terminal themes collection]: https://gogh-co.github.io/Gogh/
 type Gogh struct {
-	Name    string `yaml:"name"`
-	Author  string `yaml:"author"`
-	Variant string `yaml:"variant"` // dark or light
+	Name             string `yaml:"name"`
+	Author           string `yaml:"author"`
+	LightnessVariant string `yaml:"variant"` // dark or light
 
 	Black   string `yaml:"color_01" theme:"color_01"` // Black (Host)
 	Red     string `yaml:"color_02" theme:"color_02"` // Red (Syntax string)
@@ -30,8 +30,8 @@ type Gogh struct {
 	BrightCyan    string `yaml:"color_15" theme:"color_15"` // Bright Cyan
 	BrightWhite   string `yaml:"color_16" theme:"color_16"` // Bright White
 
-	Background string `yaml:"background"` // Background
-	Foreground string `yaml:"foreground"` // Foreground (Text)
+	Background string `yaml:"background" theme:"background"` // Background
+	Foreground string `yaml:"foreground" theme:"foreground"` // Foreground (Text)
 
 	Cursor string `yaml:"cursor"` // Cursor
 }
@@ -45,9 +45,19 @@ func ParseGogh(yml []byte) (Gogh, error) {
 }
 
 func (g Gogh) NumberedColors() []string {
-	result, err := NumberedColors(g)
+	result, err := numberedColors(g)
 	if err != nil {
 		panic(err) // TODO!
 	}
 	return result
+}
+
+func (g Gogh) Variant() (Variant, error) {
+	v := Variant(g.LightnessVariant)
+	switch v {
+	case Light, Dark:
+		return v, nil
+	default:
+		return getVariant(g)
+	}
 }

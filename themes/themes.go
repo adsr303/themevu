@@ -3,6 +3,7 @@ package themes
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -16,6 +17,17 @@ const (
 	Light Variant = "light"
 	Dark  Variant = "dark"
 )
+
+func LoadTheme(path string) (any, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	if b[0] == '{' {
+		return ParseTerminal(b)
+	}
+	return ParseGogh(b)
+}
 
 func numberedColors(theme any) ([]string, error) {
 	result := make([]string, 16)

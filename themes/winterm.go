@@ -51,3 +51,7 @@ func (t Terminal) NumberedColors() []string {
 func (t Terminal) Variant() (Variant, error) {
 	return getVariant(t)
 }
+
+func (t Terminal) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(t, "", "  ")
+}

@@ -61,3 +61,7 @@ func (g Gogh) Variant() (Variant, error) {
 		return getVariant(g)
 	}
 }
+
+func (g Gogh) ToYAML() ([]byte, error) {
+	return yaml.Marshal(g)
+}

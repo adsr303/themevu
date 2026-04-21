@@ -22,12 +22,16 @@ func main() {
 		permutate    bool
 		themeVariant string
 		themeFile    string
+		toGogh       bool
+		toTerminal   bool
 		themesDir    string
 	)
 	flag.BoolVar(&showCode, "fg", false, "show colored text on default background")
 	flag.BoolVar(&permutate, "permutate", false, "generate a color swatch of RGB permutations")
 	flag.StringVar(&themeVariant, "variant", "", "light or dark")
 	flag.StringVar(&themeFile, "theme", "", "display colors from a theme file")
+	flag.BoolVar(&toGogh, "gogh", false, "convert to Gogh format")
+	flag.BoolVar(&toTerminal, "terminal", false, "convert to terminal format")
 	flag.StringVar(&themesDir, "dir", "", "directory containing theme files")
 	flag.Parse()
 
@@ -43,35 +47,66 @@ func main() {
 	} else if themeFile == "" {
 		showStdin(showCode, permutate)
 	} else {
-		showTheme(themeFile)
+		if toGogh {
+			term, err := themes.LoadTheme(themeFile)
+			if err != nil {
+				log.Fatal(err)
+			}
+			theme, ok := term.(themes.Terminal)
+			if !ok {
+				log.Fatalf("theme %s is not a terminal theme", themeFile)
+			}
+			gogh, err := themes.ConvertToGogh(theme)
+			if err != nil {
+				log.Fatal(err)
+			}
+			b, err := gogh.ToYAML()
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(b))
+		} else if toTerminal {
+			gogh, err := themes.LoadTheme(themeFile)
+			if err != nil {
+				log.Fatal(err)
+			}
+			theme, ok := gogh.(themes.Gogh)
+			if !ok {
+				log.Fatalf("theme %s is not a Gogh theme", themeFile)
+			}
+			term, err := themes.ConvertToTerminal(theme)
+			if err != nil {
+				log.Fatal(err)
+			}
+			b, err := term.ToJSON()
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(b))
+		} else {
+			showTheme(themeFile)
+		}
 	}
 }
 
 func showTheme(path string) {
-	b, err := os.ReadFile(path)
+	theme, err := themes.LoadTheme(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if b[0] == '{' {
-		t, err := themes.ParseTerminal(b)
-		if err != nil {
-			log.Fatal(err)
-		}
+	switch t := theme.(type) {
+	case themes.Terminal:
 		simulation.PrintTitle(t.Name, t.Foreground, t.Background, t.CursorColor)
-		c := t.NumberedColors()
-		simulation.PrintAsTable(c, t.Background)
-	} else {
-		g, err := themes.ParseGogh(b)
-		if err != nil {
-			log.Fatal(err)
-		}
-		simulation.PrintTitle(g.Name, g.Foreground, g.Background, g.Cursor)
-		c := g.NumberedColors()
-		simulation.PrintAsTable(c, g.Background)
+		simulation.PrintAsTable(t.NumberedColors(), t.Background)
+	case themes.Gogh:
+		simulation.PrintTitle(t.Name, t.Foreground, t.Background, t.Cursor)
+		simulation.PrintAsTable(t.NumberedColors(), t.Background)
+	default:
+		log.Fatalf("unexpected theme type: %T", theme)
 	}
 }
 
-type variantor interface {
+type varianter interface {
 	Variant() (themes.Variant, error)
 }
 
@@ -91,29 +126,18 @@ func showDir(dir, variant string) {
 	}
 	sort.Strings(matches)
 	for _, p := range matches {
-		b, err := os.ReadFile(p)
-		if err != nil {
-			log.Fatal(err)
+		ext := filepath.Ext(p)
+		if ext != ".yml" && ext != ".json" {
+			continue
 		}
-		var theme variantor
-		ext := strings.ToLower(filepath.Ext(p))
-		switch ext {
-		case ".yml", ".yaml":
-			g, err := themes.ParseGogh(b)
-			if err != nil {
-				log.Printf("skipping %s: %v", p, err)
-				continue
-			}
-			theme = g
-		case ".json":
-			t, err := themes.ParseTerminal(b)
-			if err != nil {
-				log.Printf("skipping %s: %v", p, err)
-				continue
-			}
-			theme = t
-		default:
-			// ignore other files
+		loaded, err := themes.LoadTheme(p)
+		if err != nil {
+			log.Printf("skipping %s: %v", p, err)
+			continue
+		}
+		theme, ok := loaded.(varianter)
+		if !ok {
+			log.Fatalf("skipping %s: %T does not implement varianter", p, loaded)
 		}
 		v, err := theme.Variant()
 		if err != nil {

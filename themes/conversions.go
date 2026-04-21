@@ -41,8 +41,8 @@ func ConvertToTerminal(theme Gogh) (Terminal, error) {
 func setNumberedColors(theme any, colors []string) error {
 	themeType := reflect.TypeOf(theme).Elem()
 	themeValue := reflect.ValueOf(theme).Elem()
-	for field := range themeType.NumField() {
-		tag := themeType.Field(field).Tag.Get("theme")
+	for field := range themeType.Fields() {
+		tag := field.Tag.Get("theme")
 		if numberedColor.MatchString(tag) {
 			number, err := strconv.Atoi(tag[6:])
 			if err != nil {
@@ -51,7 +51,7 @@ func setNumberedColors(theme any, colors []string) error {
 			if number < 1 || number > 16 {
 				return fmt.Errorf("color tag out of range: %s", tag)
 			}
-			themeValue.FieldByName(themeType.Field(field).Name).SetString(colors[number-1])
+			themeValue.FieldByName(field.Name).SetString(colors[number-1])
 		}
 	}
 	return nil

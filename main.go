@@ -32,7 +32,7 @@ func main() {
 	flag.StringVar(&themeFile, "theme", "", "display colors from a theme file")
 	flag.BoolVar(&toGogh, "gogh", false, "convert to Gogh format")
 	flag.BoolVar(&toTerminal, "terminal", false, "convert to terminal format")
-	flag.StringVar(&themesDir, "dir", "", "directory containing theme files")
+	flag.StringVar(&themesDir, "dir", "", "display colors from themes in this directory")
 	flag.Parse()
 
 	switch themes.Variant(themeVariant) {
